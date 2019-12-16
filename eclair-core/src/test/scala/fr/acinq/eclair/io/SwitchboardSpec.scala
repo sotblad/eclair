@@ -10,6 +10,7 @@ import fr.acinq.eclair.TestConstants._
 import fr.acinq.eclair.blockchain.TestWallet
 import fr.acinq.eclair.db._
 import fr.acinq.eclair.wire.{ChannelCodecsSpec, Color, NodeAddress, NodeAnnouncement}
+import org.mockito.Mockito
 import org.mockito.scalatest.IdiomaticMockito
 import org.scalatest.FunSuiteLike
 import scodec.bits._
@@ -41,9 +42,9 @@ class SwitchboardSpec extends TestKit(ActorSystem("test")) with FunSuiteLike wit
     val probe = TestProbe()
 
     // mock the call that will be done by the peer once it receives Peer.Reconnect
-    mockNetworkDb.getNode(remoteNodeId) returns Some(
+    Mockito.lenient().when(mockNetworkDb.getNode(remoteNodeId)).thenReturn(Some(
       NodeAnnouncement(ByteVector64.Zeroes, ByteVector.empty, 0, remoteNodeId, Color(0,0,0), "alias", List(NodeAddress.fromParts("127.0.0.1", 9735).get))
-    )
+    ))
 
     // add a channel to the db
     nodeParams.db.channels.addOrUpdateChannel(ChannelCodecsSpec.normal)
@@ -82,9 +83,9 @@ class SwitchboardSpec extends TestKit(ActorSystem("test")) with FunSuiteLike wit
     val probe = TestProbe()
 
     // mock the call that will be done by the peer once it receives Peer.Connect(remoteNodeId)
-    mockNetworkDb.getNode(remoteNodeId) returns Some(
+    Mockito.when(mockNetworkDb.getNode(remoteNodeId)).thenReturn(Some(
       NodeAnnouncement(ByteVector64.Zeroes, ByteVector.empty, 0, remoteNodeId, Color(0,0,0), "alias", List(NodeAddress.fromParts("127.0.0.1", 9735).get))
-    )
+    ))
 
     val switchboard = system.actorOf(Switchboard.props(nodeParams, authenticator.ref, watcher.ref, router.ref, relayer.ref, paymentHandler.ref, wallet))
 
