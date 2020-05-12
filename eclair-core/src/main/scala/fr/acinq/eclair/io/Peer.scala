@@ -18,7 +18,7 @@ package fr.acinq.eclair.io
 
 import java.net.InetSocketAddress
 
-import akka.actor.{Actor, ActorRef, ExtendedActorSystem, FSM, OneForOneStrategy, PoisonPill, Props, Status, SupervisorStrategy, Terminated}
+import akka.actor.{Actor, ActorRef, FSM, OneForOneStrategy, PoisonPill, Props, Status, SupervisorStrategy, Terminated}
 import akka.event.Logging.MDC
 import akka.event.{BusLogging, DiagnosticLoggingAdapter}
 import akka.util.Timeout
@@ -31,7 +31,6 @@ import fr.acinq.eclair.blockchain.EclairWallet
 import fr.acinq.eclair.channel._
 import fr.acinq.eclair.crypto.TransportHandler
 import fr.acinq.eclair.io.Monitoring.Metrics
-import fr.acinq.eclair.io.Peer.PayToOpen
 import fr.acinq.eclair.wire._
 import fr.acinq.eclair.{wire, _}
 import scodec.bits.ByteVector
@@ -163,6 +162,11 @@ class Peer(val nodeParams: NodeParams, remoteNodeId: PublicKey, switchboard: Act
     case Event(swapOutResponse: SwapOutResponse, d: ConnectedData) =>
       d.peerConnection ! TransportHandler.ReadAck(swapOutResponse)
       context.system.eventStream.publish(swapOutResponse)
+      stay
+
+    case Event(f: SendFCMToken, d: ConnectedData) =>
+      log.info(s"peer forwarding $f to peerConnection")
+      d.peerConnection ! FCMToken(f.token)
       stay
 
     case Event(c: Peer.OpenChannel, d: ConnectedData) =>
@@ -466,7 +470,7 @@ object Peer {
 
   case class SendSwapOutRequest(nodeId: PublicKey, amountSatoshis: Satoshi, bitcoinAddress: String, feeratePerKw: Long)
   case class SendSwapInRequest(nodeId: PublicKey)
-
+  case class SendFCMToken(nodeId: PublicKey, token: String)
   // @formatter:on
 
   def makeChannelParams(nodeParams: NodeParams, defaultFinalScriptPubKey: ByteVector, isFunder: Boolean, fundingAmount: Satoshi): LocalParams = {
