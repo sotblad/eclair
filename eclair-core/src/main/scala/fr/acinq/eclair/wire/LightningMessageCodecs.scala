@@ -391,7 +391,7 @@ object LightningMessageCodecs {
 
   //
 
-    .typecase(35101, fcmTokenCodec)
+    .typecase(35017, fcmTokenCodec)
 
   val meteredLightningMessageCodec = Codec[LightningMessage](
     (msg: LightningMessage) => KamonExt.time(Metrics.EncodeDuration.withTag(Tags.MessageType, msg.getClass.getSimpleName))(lightningMessageCodec.encode(msg)),
