@@ -163,37 +163,59 @@ class Setup(datadir: File,
         case _ => ???
       }
 
-      defaultFeerates = {
-        val confDefaultFeerates = FeeratesPerKB(
-          block_1 = config.getLong("on-chain-fees.default-feerates.1"),
-          blocks_2 = config.getLong("on-chain-fees.default-feerates.2"),
-          blocks_6 = config.getLong("on-chain-fees.default-feerates.6"),
-          blocks_12 = config.getLong("on-chain-fees.default-feerates.12"),
-          blocks_36 = config.getLong("on-chain-fees.default-feerates.36"),
-          blocks_72 = config.getLong("on-chain-fees.default-feerates.72"),
-          blocks_144 = config.getLong("on-chain-fees.default-feerates.144")
-        )
-        feeratesPerKB.set(confDefaultFeerates)
-        feeratesPerKw.set(FeeratesPerKw(confDefaultFeerates))
-        confDefaultFeerates
-      }
       minFeeratePerByte = config.getLong("min-feerate")
       smoothFeerateWindow = config.getInt("smooth-feerate-window")
       readTimeout = FiniteDuration(config.getDuration("feerate-provider-timeout", TimeUnit.MILLISECONDS), TimeUnit.MILLISECONDS)
       feeProvider = (nodeParams.chainHash, bitcoin) match {
-        case (Block.RegtestGenesisBlock.hash, _) => new FallbackFeeProvider(new ConstantFeeProvider(defaultFeerates) :: Nil, minFeeratePerByte)
+        case (Block.RegtestGenesisBlock.hash, _) =>
+          val confDefaultFeerates = FeeratesPerKB(
+            block_1 = config.getLong("on-chain-fees.default-feerates.1"),
+            blocks_2 = config.getLong("on-chain-fees.default-feerates.2"),
+            blocks_6 = config.getLong("on-chain-fees.default-feerates.6"),
+            blocks_12 = config.getLong("on-chain-fees.default-feerates.12"),
+            blocks_36 = config.getLong("on-chain-fees.default-feerates.36"),
+            blocks_72 = config.getLong("on-chain-fees.default-feerates.72"),
+            blocks_144 = config.getLong("on-chain-fees.default-feerates.144")
+          )
+          new FallbackFeeProvider(new ConstantFeeProvider(confDefaultFeerates) :: Nil, minFeeratePerByte)
         case _ =>
-          new FallbackFeeProvider(new SmoothFeeProvider(new BitgoFeeProvider(nodeParams.chainHash, readTimeout), smoothFeerateWindow) :: new SmoothFeeProvider(new EarnDotComFeeProvider(readTimeout), smoothFeerateWindow) :: new ConstantFeeProvider(defaultFeerates) :: Nil, minFeeratePerByte) // order matters!
+          new FallbackFeeProvider(new SmoothFeeProvider(new BitgoFeeProvider(nodeParams.chainHash, readTimeout), smoothFeerateWindow) :: new SmoothFeeProvider(new EarnDotComFeeProvider(readTimeout), smoothFeerateWindow) :: Nil, minFeeratePerByte) // order matters!
       }
       _ = system.scheduler.schedule(0 seconds, 10 minutes)(feeProvider.getFeerates.map {
-        case feerates: FeeratesPerKB =>
+        feerates: FeeratesPerKB =>
           feeratesPerKB.set(feerates)
           feeratesPerKw.set(FeeratesPerKw(feerates))
           system.eventStream.publish(CurrentFeerates(feeratesPerKw.get))
-          logger.info(s"current feeratesPerKB=${feeratesPerKB.get()} feeratesPerKw=${feeratesPerKw.get()}")
           feeratesRetrieved.trySuccess(Done)
       })
-      _ <- feeratesRetrieved.future
+      _ <- nodeParams.db.channels.listLocalChannels().headOption match {
+        case Some(channel) =>
+          // we have a channel, default feerate will be the one in the current commitment
+          // TODO: hack! we use the same fee for all block targets
+          val feerates = FeeratesPerKw(
+            block_1 = channel.commitments.localCommit.spec.feeratePerKw,
+            blocks_2 = channel.commitments.localCommit.spec.feeratePerKw,
+            blocks_6 = channel.commitments.localCommit.spec.feeratePerKw,
+            blocks_12 = channel.commitments.localCommit.spec.feeratePerKw,
+            blocks_36 = channel.commitments.localCommit.spec.feeratePerKw,
+            blocks_72 = channel.commitments.localCommit.spec.feeratePerKw,
+            blocks_144 = channel.commitments.localCommit.spec.feeratePerKw
+          )
+          feeratesPerKB.set(FeeratesPerKB(
+            block_1 = feerateKw2KB(feerates.block_1),
+            blocks_2 = feerateKw2KB(feerates.blocks_2),
+            blocks_6 = feerateKw2KB(feerates.blocks_6),
+            blocks_12 = feerateKw2KB(feerates.blocks_12),
+            blocks_36 = feerateKw2KB(feerates.blocks_36),
+            blocks_72 = feerateKw2KB(feerates.blocks_72),
+            blocks_144 = feerateKw2KB(feerates.blocks_144)))
+          feeratesPerKw.set(feerates)
+          Future.successful(())
+        case _ =>
+          // if we don't have channels, we will wait for the fee provider
+          feeratesRetrieved.future
+      }
+      _ = logger.info(s"current feeratesPerKB=${feeratesPerKB.get()} feeratesPerKw=${feeratesPerKw.get()}")
 
       watcher = bitcoin match {
         case Electrum(electrumClient) =>
