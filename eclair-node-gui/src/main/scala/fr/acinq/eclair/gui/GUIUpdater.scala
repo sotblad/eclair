@@ -228,7 +228,7 @@ class GUIUpdater(mainController: MainController) extends Actor with ActorLogging
 
     case ZMQDisconnected =>
       log.debug("ZMQ connection DOWN")
-      runInGuiThread(() => mainController.showBlockerModal("Bitcoin Core"))
+      runInGuiThread(() => mainController.showBlockerModal("MonetaryUnit Core"))
 
     case _: ElectrumReady =>
       log.debug("Electrum connection UP")
