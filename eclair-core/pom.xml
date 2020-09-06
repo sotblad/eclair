@@ -156,8 +156,8 @@
         <!-- BITCOIN -->
         <dependency>
             <groupId>fr.acinq</groupId>
-            <artifactId>bitcoin-lib_${scala.version.short}</artifactId>
-            <version>${bitcoinlib.version}</version>
+            <artifactId>muecoin-lib_${scala.version.short}</artifactId>
+            <version>0.15-SNAPSHOT</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.google.protobuf</groupId>
