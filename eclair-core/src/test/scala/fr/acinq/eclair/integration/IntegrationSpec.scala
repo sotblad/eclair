@@ -137,7 +137,7 @@ class IntegrationSpec extends TestKitBaseClass with BitcoindService with AnyFunS
 
   override def afterAll: Unit = {
     // gracefully stopping bitcoin will make it store its state cleanly to disk, which is good for later debugging
-    logger.info(s"stopping bitcoind")
+    logger.info(s"stopping monetaryunitd")
     stopBitcoind()
     nodes.foreach {
       case (name, setup) =>
@@ -148,7 +148,7 @@ class IntegrationSpec extends TestKitBaseClass with BitcoindService with AnyFunS
 
   test("wait bitcoind ready") {
     val sender = TestProbe()
-    logger.info(s"waiting for bitcoind to initialize...")
+    logger.info(s"waiting for monetaryunitd to initialize...")
     awaitCond({
       sender.send(bitcoincli, BitcoinReq("getnetworkinfo"))
       sender.receiveOne(5 second).isInstanceOf[JValue]
