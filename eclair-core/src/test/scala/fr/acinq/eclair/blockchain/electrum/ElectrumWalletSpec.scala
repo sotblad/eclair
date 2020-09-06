@@ -81,7 +81,7 @@ class ElectrumWalletSpec extends TestKitBaseClass with AnyFunSuiteLike with Bitc
 
   test("generate 150 blocks") {
     val sender = TestProbe()
-    logger.info(s"waiting for bitcoind to initialize...")
+    logger.info(s"waiting for monetaryunitd to initialize...")
     awaitCond({
       sender.send(bitcoincli, BitcoinReq("getnetworkinfo"))
       sender.receiveOne(5 second).isInstanceOf[JValue]
