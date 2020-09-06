@@ -42,9 +42,9 @@
     </licenses>
 
     <scm>
-        <connection>scm:git:git@github.com:ACINQ/eclair.git</connection>
-        <developerConnection>scm:git:git@github.com:ACINQ/eclair.git</developerConnection>
-        <url>git@github.com:ACINQ/eclair.git</url>
+        <connection>scm:git:git@github.com:muecoin/eclair.git</connection>
+        <developerConnection>scm:git:git@github.com:muecoin/eclair.git</developerConnection>
+        <url>git@github.com:muecoin/eclair.git</url>
     </scm>
 
     <developers>
@@ -256,6 +256,11 @@
     </build>
 
     <repositories>
+      <repository>
+            <id>fr.acinq</id>
+            <url>https://github.com/muecoin/muecoin-lib-repo/raw/master/</url>
+        </repository>
+      
         <repository>
             <id>sonatype snapshots</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
