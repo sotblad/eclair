@@ -64,14 +64,14 @@ trait BitcoindService extends Logging {
 
   def startBitcoind(): Unit = {
     Files.createDirectories(PATH_BITCOIND_DATADIR.toPath)
-    if (!Files.exists(new File(PATH_BITCOIND_DATADIR.toString, "bitcoin.conf").toPath)) {
-      val is = classOf[IntegrationSpec].getResourceAsStream("/integration/bitcoin.conf")
+    if (!Files.exists(new File(PATH_BITCOIND_DATADIR.toString, "monetaryunit.conf").toPath)) {
+      val is = classOf[IntegrationSpec].getResourceAsStream("/integration/monetaryunit.conf")
       val conf = Source.fromInputStream(is).mkString
         .replace("28333", bitcoindPort.toString)
         .replace("28332", bitcoindRpcPort.toString)
         .replace("28334", bitcoindZmqBlockPort.toString)
         .replace("28335", bitcoindZmqTxPort.toString)
-      Files.writeString(new File(PATH_BITCOIND_DATADIR.toString, "bitcoin.conf").toPath, conf)
+      Files.writeString(new File(PATH_BITCOIND_DATADIR.toString, "monetaryunit.conf").toPath, conf)
     }
 
     bitcoind = s"$PATH_BITCOIND -datadir=$PATH_BITCOIND_DATADIR".run()
@@ -95,7 +95,7 @@ trait BitcoindService extends Logging {
 
   def waitForBitcoindReady(): Unit = {
     val sender = TestProbe()
-    logger.info(s"waiting for bitcoind to initialize...")
+    logger.info(s"waiting for monetaryunitd to initialize...")
     awaitCond({
       sender.send(bitcoincli, BitcoinReq("getnetworkinfo"))
       sender.expectMsgType[Any](5 second) match {
