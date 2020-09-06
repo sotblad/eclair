@@ -16,7 +16,7 @@ This software follows the [Lightning Network Specifications (BOLTs)](https://git
 :rotating_light: If you run Eclair on mainnet (which is the default setting):
 
 * Keep in mind that it is beta-quality software and **don't put too much money** in it
-* Eclair's JSON API should **NOT** be accessible from the outside world (similarly to Bitcoin Core API)
+* Eclair's JSON API should **NOT** be accessible from the outside world (similarly to MonetaryUnit Core API)
 
 ---
 
@@ -39,17 +39,17 @@ You will find detailed guides and frequently asked questions there.
 
 ## Installation
 
-### Configuring Bitcoin Core
+### Configuring MonetaryUnit Core
 
-:warning: Eclair requires Bitcoin Core 0.18.1 or 0.19.1. If you are upgrading an existing wallet, you need to create a new address and send all your funds to that address.
+:warning: Eclair requires MonetaryUnit Core 0.18.1 or 0.19.1. If you are upgrading an existing wallet, you need to create a new address and send all your funds to that address.
 
-Eclair needs a _synchronized_, _segwit-ready_, **_zeromq-enabled_**, _wallet-enabled_, _non-pruning_, _tx-indexing_ [Bitcoin Core](https://github.com/bitcoin/bitcoin) node.
-Eclair will use any BTC it finds in the default Bitcoin Core wallet to fund any channels you choose to open. Eclair will return BTC from closed channels to this wallet. You can have multiple Bitcoin Core wallets but make sure that the default one is always available.
+Eclair needs a _synchronized_, _segwit-ready_, **_zeromq-enabled_**, _wallet-enabled_, _non-pruning_, _tx-indexing_ [MonetaryUnit Core](https://github.com/bitcoin/bitcoin) node.
+Eclair will use any BTC it finds in the default MonetaryUnit Core wallet to fund any channels you choose to open. Eclair will return BTC from closed channels to this wallet. You can have multiple MonetaryUnit Core wallets but make sure that the default one is always available.
 Any BTC found in the wallet can be used to fund the channels you choose to open and the BTC from closed channels will return to this wallet. 
-You can configure your Bitcoin Node to use either `p2sh-segwit` addresses or `bech32` addresses, Eclair is compatible with both modes.
-If your Bitcoin Core wallet has "non-segwit UTXOs" (outputs that are neither `p2sh-segwit` or `bech32`), you must send them to a `p2sh-segwit` or `bech32` address.
+You can configure your MonetaryUnit Node to use either `p2sh-segwit` addresses or `bech32` addresses, Eclair is compatible with both modes.
+If your MonetaryUnit Core wallet has "non-segwit UTXOs" (outputs that are neither `p2sh-segwit` or `bech32`), you must send them to a `p2sh-segwit` or `bech32` address.
 
-Run bitcoind with the following minimal `bitcoin.conf`:
+Run monetaryunitd with the following minimal `monetaryunit.conf`:
 
 ```conf
 server=1
@@ -96,10 +96,10 @@ name                         | description                                      
  eclair.api.enabled          | Enable/disable the API                                                                | false. By default the API is disabled. If you want to enable it, you must set a password.
  eclair.api.port             | API HTTP port                                                                         | 8080
  eclair.api.password         | API password (BASIC)                                                                  | "" (must be set if the API is enabled)
- eclair.bitcoind.rpcuser     | Bitcoin Core RPC user                                                                 | foo
- eclair.bitcoind.rpcpassword | Bitcoin Core RPC password                                                             | bar
- eclair.bitcoind.zmqblock    | Bitcoin Core ZMQ block address                                                        | "tcp://127.0.0.1:29000"
- eclair.bitcoind.zmqtx       | Bitcoin Core ZMQ tx address                                                           | "tcp://127.0.0.1:29000"
+ eclair.monetaryunitd.rpcuser     | MonetaryUnit Core RPC user                                                                 | foo
+ eclair.monetaryunitd.rpcpassword | MonetaryUnit Core RPC password                                                             | bar
+ eclair.monetaryunitd.zmqblock    | MonetaryUnit Core ZMQ block address                                                        | "tcp://127.0.0.1:29000"
+ eclair.monetaryunitd.zmqtx       | MonetaryUnit Core ZMQ tx address                                                           | "tcp://127.0.0.1:29000"
 
 Quotes are not required unless the value contains special characters. Full syntax guide [here](https://github.com/lightbend/config/blob/master/HOCON.md).
 
@@ -189,16 +189,16 @@ eclair-node-<version>-<commit_id>/bin/eclair-node.sh <plugin1.jar> <plugin2.jar>
 
 ## Testnet usage
 
-Eclair is configured to run on mainnet by default, but you can still run it on testnet (or regtest): start your Bitcoin Node in
- testnet mode (add `testnet=1` in `bitcoin.conf` or start with `-testnet`), and change Eclair's chain parameter and Bitcoin RPC port:
+Eclair is configured to run on mainnet by default, but you can still run it on testnet (or regtest): start your MonetaryUnit Node in
+ testnet mode (add `testnet=1` in `monetaryunit.conf` or start with `-testnet`), and change Eclair's chain parameter and MonetaryUnit RPC port:
 
 ```conf
 eclair.chain=testnet
-eclair.bitcoind.rpcport=18332
+eclair.MonetaryUnit.rpcport=18332
 ```
 
-You may also want to take advantage of the new configuration sections in `bitcoin.conf` to manage parameters that are network specific,
-so you can easily run your bitcoin node on both mainnet and testnet. For example you could use:
+You may also want to take advantage of the new configuration sections in `monetaryunit.conf` to manage parameters that are network specific,
+so you can easily run your monetaryunit node on both mainnet and testnet. For example you could use:
 
 ```conf
 server=1
@@ -217,6 +217,6 @@ zmqpubrawtx=tcp://127.0.0.1:29001
 
 ## Resources
 
-* [1] [The Bitcoin Lightning Network: Scalable Off-Chain Instant Payments](https://lightning.network/lightning-network-paper.pdf) by Joseph Poon and Thaddeus Dryja
+* [1] [The MonetaryUnit Lightning Network: Scalable Off-Chain Instant Payments](https://lightning.network/lightning-network-paper.pdf) by Joseph Poon and Thaddeus Dryja
 * [2] [Reaching The Ground With Lightning](https://github.com/ElementsProject/lightning/raw/master/doc/deployable-lightning.pdf) by Rusty Russell
 * [3] [Lightning Network Explorer](https://explorer.acinq.co) - Explore testnet LN nodes you can connect to
