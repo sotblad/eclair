@@ -167,14 +167,14 @@ class Setup(datadir: File,
       } yield (progress, ibd, chainHash, bitcoinVersion, unspentAddresses, blocks, headers)
       // blocking sanity checks
       val (progress, initialBlockDownload, chainHash, bitcoinVersion, unspentAddresses, blocks, headers) = await(future, 30 seconds, "bicoind did not respond after 30 seconds")
-      assert(bitcoinVersion >= 170000, "Eclair requires Bitcoin Core 0.17.0 or higher")
+      assert(bitcoinVersion >= 150000, "Eclair requires Bitcoin Core 0.15.0 or higher")
       assert(chainHash == nodeParams.chainHash, s"chainHash mismatch (conf=${nodeParams.chainHash} != bitcoind=$chainHash)")
       if (chainHash != Block.RegtestGenesisBlock.hash) {
         assert(unspentAddresses.forall(address => !isPay2PubkeyHash(address)), "Your wallet contains non-segwit UTXOs. You must send those UTXOs to a p2sh-segwit or bech32 address to use Eclair (check out our README for more details).")
       }
-      assert(!initialBlockDownload, s"bitcoind should be synchronized (initialblockdownload=$initialBlockDownload)")
-      assert(progress > 0.999, s"bitcoind should be synchronized (progress=$progress)")
-      assert(headers - blocks <= 1, s"bitcoind should be synchronized (headers=$headers blocks=$blocks)")
+      assert(!initialBlockDownload, s"monetaryunitd should be synchronized (initialblockdownload=$initialBlockDownload)")
+      assert(progress > 0.9, s"monetaryunitd should be synchronized (progress=$progress)")
+      assert(headers - blocks <= 1, s"monetaryunitd should be synchronized (headers=$headers blocks=$blocks)")
       Bitcoind(bitcoinClient)
     case ELECTRUM =>
       val addresses = config.hasPath("electrum") match {
