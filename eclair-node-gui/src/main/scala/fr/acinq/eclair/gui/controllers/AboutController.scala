@@ -36,7 +36,7 @@ class AboutController(hostServices: HostServices) extends Logging {
 
   @FXML def openACINQPage = hostServices.showDocument("https://acinq.co")
 
-  @FXML def openGithubPage = hostServices.showDocument("https://github.com/ACINQ/eclair")
+  @FXML def openGithubPage = hostServices.showDocument("https://github.com/muecoin/eclair")
 
   @FXML def openLNRFCPage = hostServices.showDocument("https://github.com/lightningnetwork/lightning-rfc")
 }
