@@ -34,14 +34,14 @@ trait ElectrumxService extends DockerTestKit {
     // we use our own docker image because other images on Docker lag behind and don't yet support 1.4
     DockerContainer("acinq/electrumx")
       .withNetworkMode("host")
-      .withEnv(s"DAEMON_URL=http://foo:bar@localhost:$bitcoindRpcPort", "COIN=BitcoinSegwit", "NET=regtest", s"TCP_PORT=$electrumPort")
+      .withEnv(s"DAEMON_URL=http://foo:bar@localhost:$bitcoindRpcPort", "COIN=MonetaryUnit", "NET=regtest", s"TCP_PORT=$electrumPort")
       //.withLogLineReceiver(LogLineReceiver(true, println))
   } else {
     // on windows or oxs, host mode is not available, but from docker 18.03 on host.docker.internal can be used instead
     // host.docker.internal is not (yet ?) available on linux though
     DockerContainer("acinq/electrumx")
       .withPorts(electrumPort -> Some(electrumPort))
-      .withEnv(s"DAEMON_URL=http://foo:bar@host.docker.internal:$bitcoindRpcPort", "COIN=BitcoinSegwit", "NET=regtest", s"TCP_PORT=$electrumPort")
+      .withEnv(s"DAEMON_URL=http://foo:bar@host.docker.internal:$bitcoindRpcPort", "COIN=MonetaryUnit", "NET=regtest", s"TCP_PORT=$electrumPort")
       //.withLogLineReceiver(LogLineReceiver(true, println))
   }
 
