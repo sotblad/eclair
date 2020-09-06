@@ -53,11 +53,11 @@ class FxApp extends Application with Logging {
     case e@TCPBindException(port) =>
       notifyPreloader(new ErrorNotification("Setup", s"Could not bind to port $port", e))
     case e@BitcoinRPCConnectionException =>
-      notifyPreloader(new ErrorNotification("Setup", "Could not connect to Bitcoin Core using JSON-RPC.", e))
-      notifyPreloader(new AppNotification(InfoAppNotification, "Make sure that Bitcoin Core is up and running and RPC parameters are correct."))
+      notifyPreloader(new ErrorNotification("Setup", "Could not connect to MonetaryUnit Core using JSON-RPC.", e))
+      notifyPreloader(new AppNotification(InfoAppNotification, "Make sure that MonetaryUnit Core is up and running and RPC parameters are correct."))
     case e@BitcoinZMQConnectionTimeoutException =>
-      notifyPreloader(new ErrorNotification("Setup", "Could not connect to Bitcoin Core using ZMQ.", e))
-      notifyPreloader(new AppNotification(InfoAppNotification, "Make sure that Bitcoin Core is up and running and ZMQ parameters are correct."))
+      notifyPreloader(new ErrorNotification("Setup", "Could not connect to MonetaryUnit Core using ZMQ.", e))
+      notifyPreloader(new AppNotification(InfoAppNotification, "Make sure that MonetaryUnit Core is up and running and ZMQ parameters are correct."))
     case e@IncompatibleDBException =>
       notifyPreloader(new ErrorNotification("Setup", "Breaking changes!", e))
       notifyPreloader(new AppNotification(InfoAppNotification, "Eclair is still in alpha, and under heavy development. Last update was not backward compatible."))
@@ -89,7 +89,7 @@ class FxApp extends Application with Logging {
           val unitConf = setup.config.getString("gui.unit")
           FxApp.unit = Try(CoinUtils.getUnitFromString(unitConf)) match {
             case Failure(_) =>
-              logger.warn(s"$unitConf is not a valid gui unit, must be msat, sat, bits, mbtc or btc. Defaulting to btc.")
+              logger.warn(s"$unitConf is not a valid gui unit, must be msat, sat, bits, mmue or mue. Defaulting to mue.")
               BtcUnit
             case Success(u) => u
           }
@@ -108,7 +108,7 @@ class FxApp extends Application with Logging {
               Platform.runLater(new Runnable {
                 override def run(): Unit = {
                   val scene = new Scene(mainRoot)
-                  primaryStage.setTitle("Eclair")
+                  primaryStage.setTitle("MonetaryUnit Eclair - Lightning Network")
                   primaryStage.setMinWidth(750)
                   primaryStage.setWidth(980)
                   primaryStage.setMinHeight(400)
